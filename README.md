@@ -26,7 +26,7 @@ docker compose build
 
 ## Tests ##
 ```bash
-poetry run pytest --cov-report=term-missing --cov=msci
+poetry run pytest
 ```
 ## Formatting ##
 ```bash
@@ -34,7 +34,7 @@ ruff check
 ruff format
 ```
 
-## Linkting ##
+## Linting ##
 ```bash
 pylint msci
 ```
