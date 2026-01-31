@@ -1,20 +1,20 @@
 """Request and response models."""
 
-from pydantic import BaseModel, RootModel
+from pydantic import BaseModel, RootModel, Field
 
 
 class WordFrequencyGet(BaseModel):
     """GET WordFrequency"""
 
-    article: str
-    depth: int
+    article: str = Field(min_length=1)
+    depth: int = Field(ge=0)
 
 
 class WordFrequencyPost(WordFrequencyGet):
     """POST WordFrequency"""
 
-    ignore_list: list[str] = []
-    percentile: int | None = None
+    ignore_list: list[str] | None = None
+    percentile: int | None = Field(ge=0, le=100, default=None)
 
 
 class WordFrequencyResult(RootModel):

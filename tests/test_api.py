@@ -1,3 +1,4 @@
+""" test api"""
 from unittest import mock
 import os
 
@@ -26,9 +27,9 @@ EXTRACT_RESPONSE = {"query": {"pages": {"1": {"title": "title", "extract": ""}}}
 
 @pytest.fixture
 def env(http_testserver):
-    env = {"MSCI_WIKI_API_URL": http_testserver.url}
-    with mock.patch.dict(os.environ, env):
-        yield env
+    env_vars = {"MSCI_WIKI_API_URL": http_testserver.url}
+    with mock.patch.dict(os.environ, env_vars):
+        yield env_vars
 
 
 @pytest.fixture

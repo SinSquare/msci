@@ -21,7 +21,7 @@ def get_wiki_word_freq():
 
 # pylint: disable=dangerous-default-value
 async def handle_work(
-    wiki, key, ignore_list: list[str] = [], percentile: int | None = None
+    wiki, key, ignore_list: list[str] | None = None, percentile: int | None = None
 ):
     """Handle work retrieval"""
     while (result := wiki.get_result(key)) is None:
@@ -33,8 +33,9 @@ async def handle_work(
             detail={"message": result.get("error", "An unknown error happened")},
         )
     words = result["words"]
-    for word in ignore_list:
-        words.pop(word, None)
+    if ignore_list is not None:
+        for word in ignore_list:
+            words.pop(word, None)
 
     if percentile is not None:
         counts = np.array(list(words.values()))
