@@ -1,5 +1,7 @@
-from msci.wiki_word_frequency import WikiWordFrequency
+from unittest.mock import call
 import copy
+
+from msci.wiki_word_frequency import WikiWordFrequency
 
 EXTRACT_RESPONSE = {
     "query": {"pages": {"1": {"title": "title", "extract": "Some words here."}}}
@@ -135,3 +137,20 @@ def test_wiki_error(http_testserver):
         "success": False,
         "error": "Could not get response from wikipedia because of HTTP 500",
     }
+
+
+def test_wiki_retry(http_testserver, mocker):
+    resp = [({}, 429, {"Retry-After": "2"}), ({}, 429), (EXTRACT_RESPONSE)]
+    resp_gen = (r for r in resp)
+    sleep_mock = mocker.patch("time.sleep")
+
+    def callback():
+        return next(resp_gen)
+
+    http_testserver.add_callback("/", callback)
+    wiki = WikiWordFrequency(1, http_testserver.url, "test")
+    key = wiki.add_job("test", 0)
+    while (result := wiki.get_result(key)) is None:
+        pass
+    assert result == {"success": True, "words": {"Some": 1, "words": 1, "here": 1}}
+    assert sleep_mock.call_args_list == [call(3), call(18)]

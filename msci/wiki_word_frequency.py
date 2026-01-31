@@ -80,7 +80,7 @@ class WikiWordFrequency:
                             "HTTP 429 - sleeping for %ds (retry-after)", retry_after + 1
                         )
                         time.sleep(retry_after + 1)
-                    except ValueError:
+                    except (ValueError, TypeError):
                         log.warning(
                             "HTTP 429 - sleeping for %ds (fallback)", 2 * 3**try_cnt
                         )

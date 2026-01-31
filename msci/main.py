@@ -29,7 +29,7 @@ async def handle_work(
     if not result.get("success", False):
         raise HTTPException(
             status_code=500,
-            detail={"message": result.get("error_mesage", "An unknown error happened")},
+            detail={"message": result.get("error", "An unknown error happened")},
         )
     words = result["words"]
     for word in ignore_list:

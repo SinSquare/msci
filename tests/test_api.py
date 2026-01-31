@@ -1,7 +1,8 @@
-import pytest
-import os
-from fastapi.testclient import TestClient
 from unittest import mock
+import os
+
+from fastapi.testclient import TestClient
+import pytest
 
 from msci.main import app
 from msci.state import get_config, get_wiki
@@ -36,7 +37,7 @@ def server(http_testserver):
         req = http_testserver.request
         titles = req.args.get("titles").split("|")
         if titles == ["error"]:
-            return {}, 500
+            return {}, 403
         prop = req.args.get("prop")
         if prop == "links":
             return LINKS_RESPONSE
@@ -96,7 +97,11 @@ def test_api_get_error(env, server):
     client = TestClient(app)
     resp = client.get("/word-frequency", params={"article": "error", "depth": 0})
     assert resp.status_code == 500
-    assert resp.json() == {"detail": {"message": "An unknown error happened"}}
+    assert resp.json() == {
+        "detail": {
+            "message": "Could not get response from wikipedia because of HTTP 403"
+        }
+    }
 
 
 def test_api_real():
