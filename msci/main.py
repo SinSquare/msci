@@ -1,6 +1,7 @@
 """msci main app"""
 
 from typing import Annotated
+import asyncio
 
 import numpy as np
 from fastapi import FastAPI, Depends, HTTPException, Query
@@ -24,7 +25,7 @@ async def handle_work(
 ):
     """Handle work retrieval"""
     while (result := wiki.get_result(key)) is None:
-        pass
+        await asyncio.sleep(0.1)
     wiki.cleanup(key)
     if not result.get("success", False):
         raise HTTPException(
