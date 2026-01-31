@@ -2,8 +2,9 @@ import pytest
 import os
 from fastapi.testclient import TestClient
 from unittest import mock
-from msci.main import app
 
+from msci.main import app
+from msci.state import get_config, get_wiki
 
 EXTRACT_TEXTS = {
     "title1": (
@@ -99,6 +100,8 @@ def test_api_get_error(env, server):
 
 
 def test_api_real():
+    get_config.cache_clear()
+    get_wiki.cache_clear()
     client = TestClient(app)
     resp = client.get("/word-frequency", params={"article": "test", "depth": 0})
     assert resp.status_code == 200
