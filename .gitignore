@@ -1,0 +1,9 @@
+.pytest_cache
+.ruff_cache
+*.egg-info
+*.swp
+.coverage
+.DS_Store
+.python-version
+__pycache__
+.env
