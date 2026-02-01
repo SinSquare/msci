@@ -26,6 +26,7 @@ class WikiError(Exception):
 
 @dataclass(frozen=True)
 class WikiResult:
+    """Wiki result """
     success: bool
     words: dict[str, int] | None = None
     error: str | None = None
