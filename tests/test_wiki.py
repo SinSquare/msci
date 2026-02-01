@@ -1,4 +1,5 @@
 """test wiki"""
+
 from unittest.mock import call
 import copy
 
@@ -21,8 +22,8 @@ def test_wiki_extract(http_testserver):
     key = wiki.add_job("test", 0)
     while (result := wiki.get_result(key)) is None:
         pass
-    assert result["success"]
-    assert result["words"] == {"here": 1, "words": 1, "Some": 1}
+    assert result.success
+    assert result.words == {"here": 1, "words": 1, "Some": 1}
     assert http_testserver.request_log == ["GET /"]
     request = http_testserver.pop_first()
     assert request["params"] == {
@@ -60,8 +61,8 @@ def test_wiki_links(http_testserver):
     key = wiki.add_job("test", 1)
     while (result := wiki.get_result(key)) is None:
         pass
-    assert result["success"]
-    assert result["words"] == {"test": 1, "title2": 1, "title1": 1}
+    assert result.success
+    assert result.words == {"test": 1, "title2": 1, "title1": 1}
 
 
 def test_wiki_continue(http_testserver):
@@ -94,8 +95,8 @@ def test_wiki_continue(http_testserver):
     key = wiki.add_job("test", 1)
     while (result := wiki.get_result(key)) is None:
         pass
-    assert result["success"]
-    assert result["words"] == {"test": 1, "title2": 1, "title1": 1}
+    assert result.success
+    assert result.words == {"test": 1, "title2": 1, "title1": 1}
 
 
 def test_wiki_links_duplicated(http_testserver):
@@ -120,8 +121,8 @@ def test_wiki_links_duplicated(http_testserver):
     key = wiki.add_job("test", 1)
     while (result := wiki.get_result(key)) is None:
         pass
-    assert result["success"]
-    assert result["words"] == {"test": 1, "title1": 1}
+    assert result.success
+    assert result.words == {"test": 1, "title1": 1}
     assert len(http_testserver.request_log) == 4
 
 
@@ -134,10 +135,8 @@ def test_wiki_error(http_testserver):
     key = wiki.add_job("test", 1)
     while (result := wiki.get_result(key)) is None:
         pass
-    assert result == {
-        "success": False,
-        "error": "Could not get response from wikipedia because of HTTP 500",
-    }
+    assert not result.success
+    assert result.error == "Could not get response from wikipedia because of HTTP 500"
 
 
 def test_wiki_retry(http_testserver, mocker):
@@ -153,5 +152,6 @@ def test_wiki_retry(http_testserver, mocker):
     key = wiki.add_job("test", 0)
     while (result := wiki.get_result(key)) is None:
         pass
-    assert result == {"success": True, "words": {"Some": 1, "words": 1, "here": 1}}
+    assert result.success
+    assert result.words == {"Some": 1, "words": 1, "here": 1}
     assert sleep_mock.call_args_list == [call(3), call(18)]

@@ -27,12 +27,12 @@ async def handle_work(
     while (result := wiki.get_result(key)) is None:
         await asyncio.sleep(0.1)
     wiki.cleanup(key)
-    if not result.get("success", False):
+    if not result.success:
         raise HTTPException(
             status_code=500,
-            detail={"message": result.get("error", "An unknown error happened")},
+            detail={"message": result.error},
         )
-    words = result["words"]
+    words = result.words
     if ignore_list is not None:
         for word in ignore_list:
             words.pop(word, None)

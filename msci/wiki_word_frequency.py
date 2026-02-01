@@ -2,6 +2,7 @@
 
 from collections import Counter
 from concurrent.futures import ThreadPoolExecutor
+from dataclasses import dataclass
 from functools import partial
 from threading import Lock
 import logging
@@ -21,6 +22,13 @@ class WikiError(Exception):
     def __init__(self, message):
         self.message = message
         super().__init__(message)
+
+
+@dataclass(frozen=True)
+class WikiResult:
+    success: bool
+    words: dict[str, int] | None = None
+    error: str | None = None
 
 
 class WikiWordFrequency:
@@ -160,7 +168,8 @@ class WikiWordFrequency:
     def _error(self, key, message):
         if key in self._results:
             return
-        self._results.update({key: {"success": False, "error": message}})
+        res = WikiResult(success=False, error=message)
+        self._results.update({key: res})
         self._words.pop(key, None)
         self._links.pop(key, None)
         self._futures.pop(key, None)
@@ -173,7 +182,8 @@ class WikiWordFrequency:
         if len(self._futures[key]) > 0:
             return
         words = self._words.pop(key, {})
-        self._results.update({key: {"success": True, "words": words}})
+        res = WikiResult(success=True, words=words)
+        self._results.update({key: res})
         self._links.pop(key, None)
         self._futures.pop(key, None)
 
